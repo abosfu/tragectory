@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* STRICT BLACK-WHITE MONOCHROME — Color System */
+    --color-white: #FFFFFF;        /* pure white for all backgrounds */
+    --color-black: #000000;        /* pure black for primary text and accents */
+    --color-grey: #9A9A9A;         /* single grey for secondary text */
+    --color-border: #E0E0E0;       /* light grey for borders */
+    
+    /* Unified variable mapping */
+    --color-bg: var(--color-white);
+    --color-text-primary: var(--color-black);
+    --color-text-secondary: var(--color-grey);
+    --color-accent: var(--color-black);
+    
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+  }
+
+  * {
+    @apply border-[var(--color-border)];
+  }
+
+  body {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--color-white);
+    color: var(--color-black);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ABDULLAH SANS — Typography System */
+  
+  /* Display / Logo Style */
+  h1, .display {
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  /* Heading Style */
+  h2, .heading {
+    font-weight: 500;
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-weight: 500;
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+
+  /* Body Style */
+  p, body {
+    font-weight: 400;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* Meta / Labels Style */
+  .meta, .label {
+    font-weight: 500;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+  }
+
+  /* Code / ID Style */
+  .code {
+    font-weight: 500;
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  button {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  input, textarea {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+  
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+  
+  .text-black {
+    color: var(--color-black);
+  }
+  
+  .text-ink {
+    color: var(--color-black);
+  }
+  
+  .text-smoke {
+    color: var(--color-grey);
+  }
+  
+  .bg-primary {
+    background-color: var(--color-bg);
+  }
+  
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  
+  .bg-bone {
+    background-color: var(--color-white);
+  }
+  
+  .bg-paper {
+    background-color: var(--color-white);
+  }
+  
+  .bg-black {
+    background-color: var(--color-black);
+  }
+  
+  .bg-ink {
+    background-color: var(--color-black);
+  }
+  
+  .border-abd {
+    border-color: var(--color-border);
+  }
+}
