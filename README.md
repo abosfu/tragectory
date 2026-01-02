@@ -1,53 +1,18 @@
-<<<<<<< HEAD
-# Create T3 App
+# WASL App (T3 Stack)
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Bootstrapped with **Create T3 App** (Next.js + TypeScript + Tailwind + tRPC + Prisma).
 
-## What's next? How do I make an app with this?
+## Dev setup
+1. Copy env: `cp .env.example .env` (fill any keys later)
+2. Install: `npm install`
+3. DB migrate (SQLite by default): `npx prisma migrate dev --name init`
+4. Generate Prisma client: `npx prisma generate`
+5. Run dev: `npm run dev` (visit http://localhost:3000)
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Prisma tips
+- Open DB UI: `npx prisma studio`
+- Default client output lives in `node_modules/@prisma/client` (we do **not** commit generated/).
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
-
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
-=======
-# WASL (wasl-app)
-
-A provenance-first Islamic history navigator (no AI).  
-**Stack:** Next.js (T3), Prisma, Postgres, Tailwind, tRPC, Leaflet.
-
-## Status
-Bootstrap phase. Setting up schema (Eras, Events, Places, Sources, Citations) and three pages (Timeline → Era → Event).
-
-## Roadmap (short)
-- [ ] DB schema + seed (small set of eras/events/sources)
-- [ ] API routes: `/api/eras`, `/api/eras/[slug]`, `/api/events/[slug]`
-- [ ] Pages: `/`, `/era/[slug]`, `/event/[slug]`
-- [ ] Map pins for events with coordinates
-- [ ] Faceted search (era/place/source type)
-
-## Dev (coming soon)
-After scaffolding:
-```bash
-pnpm install
-pnpm prisma migrate dev
-pnpm dev
->>>>>>> origin/main
+## Project notes
+- Repo ignores `/generated` to keep Git clean.
+- Use feature branches for new work (`git checkout -b feature/<thing>`), open PRs to `main`.
