@@ -186,3 +186,4 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 >>>>>>> origin/main
+/generated
