@@ -9,13 +9,73 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
+// ============================================================================
+// USER PROFILES
+// ============================================================================
+
+model UserProfile {
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([name])
+    // Basic identity / context
+    name          String? // optional, user may leave it blank
+    currentStatus String // e.g. "3rd year CS at SFU"
+    interests     String // free-text interests/goals
+    location      String? // optional city/region
+    timeline      String // e.g. "next 6–12 months"
+    stage         String // e.g. "Student" | "NewGrad" | "CareerSwitch" | "MidCareer"
+    extraInfo     String? // free-text unique situation
+
+    paths UserPathSelection[]
+}
+
+// ============================================================================
+// USER PATH SELECTIONS (AI-generated recommendations)
+// ============================================================================
+
+model UserPathSelection {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+    userProfileId String
+
+    aiLabel        String // short title of the path
+    aiExplanation  String // why this path makes sense for the profile
+    targetRole     String? // e.g. "Software Engineer", "Product Analyst"
+    targetIndustry String? // e.g. "Fintech", "Construction-tech"
+    rank           Int // ordering 1,2,3,...
+
+    // Later we may associate paths with specific case studies; for now no relation.
+
+    @@index([userProfileId])
+}
+
+// ============================================================================
+// CASE STUDIES (real stories from various sources)
+// ============================================================================
+
+model CaseStudy {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    sourceUrl    String // original URL (YouTube, LinkedIn, blog, etc.)
+    sourceType   String // "video" | "article" | "linkedin" | "other" (stored as string)
+    title        String
+    roleType     String? // e.g. "SWE", "Product Manager", "Data Analyst"
+    stage        String? // "Student" | "NewGrad" | etc.
+    tags         String? // comma-separated tags, e.g. "non-cs,fintech,bootcamp"
+    shortSummary String? // AI-generated or manually written summary
+    fetchedAt    DateTime? // when we ingested this case study
+
+    // No relations yet; we will match by roleType/stage/tags later.
+
+    @@index([roleType])
+    @@index([stage])
 }

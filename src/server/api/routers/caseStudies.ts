@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { db } from "~/server/db";
 
-export interface CaseStudy {
+// ============================================================================
+// MOCK DATA (kept for existing UI compatibility)
+// ============================================================================
+
+export interface MockCaseStudy {
   id: string;
   title: string;
   roleType: string;
@@ -10,8 +15,9 @@ export interface CaseStudy {
   url: string;
 }
 
-// Mock case studies data by pathId
-const mockCaseStudies: Record<string, CaseStudy[]> = {
+// Mock case studies data by pathId - DO NOT MODIFY
+// This data is used by the existing /paths/[pathId] page
+const mockCaseStudies: Record<string, MockCaseStudy[]> = {
   swe: [
     {
       id: "swe-1",
@@ -101,11 +107,100 @@ const mockCaseStudies: Record<string, CaseStudy[]> = {
   ],
 };
 
+// ============================================================================
+// TRPC ROUTER
+// ============================================================================
+
 export const caseStudiesRouter = createTRPCRouter({
+  // ==========================================================================
+  // MOCK PROCEDURE (existing - DO NOT MODIFY)
+  // Used by: /paths/[pathId]/page.tsx
+  // ==========================================================================
+
+  /**
+   * Get mock case studies by path ID
+   * @deprecated This uses mock data. Use listRecent for DB-backed data.
+   */
   getByPath: publicProcedure
     .input(z.object({ pathId: z.string() }))
     .query(({ input }) => {
       return mockCaseStudies[input.pathId] ?? [];
     }),
-});
 
+  // ==========================================================================
+  // DB-BACKED PROCEDURES (new - for future use)
+  // ==========================================================================
+
+  /**
+   * Manually create a case study in the database
+   * 
+   * Use this to seed case studies or for admin functionality.
+   * In the future, we'll have automated ingestion from YouTube/blogs/etc.
+   * 
+   * // TODO: When we add AI ingestion, we'll need:
+   * // - GEMINI_API_KEY for summarization
+   * // - YOUTUBE_API_KEY for video metadata (optional)
+   */
+  createManual: publicProcedure
+    .input(
+      z.object({
+        sourceUrl: z.string().url("Must be a valid URL"),
+        sourceType: z.enum(["video", "article", "linkedin", "other"]),
+        title: z.string().min(1, "Title is required"),
+        roleType: z.string().optional(),
+        stage: z.enum(["Student", "NewGrad", "CareerSwitch", "MidCareer"]).optional(),
+        tags: z.string().optional(),
+        shortSummary: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const caseStudy = await db.caseStudy.create({
+        data: {
+          sourceUrl: input.sourceUrl,
+          sourceType: input.sourceType,
+          title: input.title,
+          roleType: input.roleType,
+          stage: input.stage,
+          tags: input.tags,
+          shortSummary: input.shortSummary,
+          fetchedAt: new Date(),
+        },
+      });
+
+      return caseStudy;
+    }),
+
+  /**
+   * List recent case studies from the database
+   * 
+   * Supports optional filtering by roleType and stage.
+   * Returns results ordered by most recently fetched/created.
+   */
+  listRecent: publicProcedure
+    .input(
+      z
+        .object({
+          roleType: z.string().optional(),
+          stage: z.string().optional(),
+          limit: z.number().min(1).max(100).optional(),
+        })
+        .optional()
+    )
+    .query(async ({ input }) => {
+      const limit = input?.limit ?? 20;
+
+      const caseStudies = await db.caseStudy.findMany({
+        where: {
+          ...(input?.roleType && { roleType: input.roleType }),
+          ...(input?.stage && { stage: input.stage }),
+        },
+        orderBy: [
+          { fetchedAt: "desc" },
+          { createdAt: "desc" },
+        ],
+        take: limit,
+      });
+
+      return caseStudies;
+    }),
+});

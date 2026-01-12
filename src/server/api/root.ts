@@ -1,5 +1,7 @@
 import { pathsRouter } from "~/server/api/routers/paths";
 import { caseStudiesRouter } from "~/server/api/routers/caseStudies";
+import { profileRouter } from "~/server/api/routers/profile";
+import { recommendationRouter } from "~/server/api/routers/recommendation";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -8,8 +10,13 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  // Existing routers (mock data for UI)
   paths: pathsRouter,
   caseStudies: caseStudiesRouter,
+
+  // New routers (DB-backed, for Phase 2 integration)
+  profile: profileRouter,
+  recommendation: recommendationRouter,
 });
 
 // export type definition of API
