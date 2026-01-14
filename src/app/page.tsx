@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -12,10 +13,52 @@ export default function HomePage() {
     location: "",
     timeline: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  // tRPC mutations
+  const createProfile = api.profile.createProfile.useMutation();
+  const generatePaths = api.recommendation.generatePathsForProfile.useMutation();
+
+  const isLoading = createProfile.isPending || generatePaths.isPending;
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    router.push("/paths");
+    setError(null);
+
+    // Validate required fields
+    if (!formData.studying.trim()) {
+      setError("Please tell us what you're studying or working on.");
+      return;
+    }
+    if (!formData.roles.trim()) {
+      setError("Please tell us what types of roles interest you.");
+      return;
+    }
+    if (!formData.timeline.trim()) {
+      setError("Please provide your timeline.");
+      return;
+    }
+
+    try {
+      // 1. Create the user profile
+      const profile = await createProfile.mutateAsync({
+        name: formData.name || undefined,
+        currentStatus: formData.studying,
+        interests: formData.roles,
+        location: formData.location || undefined,
+        timeline: formData.timeline,
+        stage: "Student", // Hard-coded for v1
+      });
+
+      // 2. Generate paths for this profile
+      await generatePaths.mutateAsync({ profileId: profile.id });
+
+      // 3. Navigate to results page
+      router.push(`/results/${profile.id}`);
+    } catch (err) {
+      console.error("Error creating profile:", err);
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -154,7 +197,8 @@ export default function HomePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm"
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Your name"
                     />
                   </div>
@@ -173,7 +217,8 @@ export default function HomePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, studying: e.target.value })
                       }
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm"
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., Computer Science, Marketing"
                     />
                   </div>
@@ -191,7 +236,8 @@ export default function HomePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, roles: e.target.value })
                       }
-                      className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm"
+                      disabled={isLoading}
+                      className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., Software development, product management..."
                     />
                   </div>
@@ -211,7 +257,8 @@ export default function HomePage() {
                         onChange={(e) =>
                           setFormData({ ...formData, location: e.target.value })
                         }
-                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g., Toronto"
                       />
                     </div>
@@ -230,17 +277,24 @@ export default function HomePage() {
                         onChange={(e) =>
                           setFormData({ ...formData, timeline: e.target.value })
                         }
-                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Next 6-12 months"
                       />
                     </div>
                   </div>
 
+                  {/* Error message */}
+                  {error && (
+                    <p className="text-sm text-red-600">{error}</p>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full bg-black text-white hover:bg-neutral-800 h-12 text-sm font-medium rounded-lg transition-colors mt-2"
+                    disabled={isLoading}
+                    className="w-full bg-black text-white hover:bg-neutral-800 h-12 text-sm font-medium rounded-lg transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    See possible paths →
+                    {isLoading ? "Creating your paths..." : "See possible paths →"}
                   </button>
                 </form>
               </div>
