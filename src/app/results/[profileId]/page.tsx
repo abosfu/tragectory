@@ -1,8 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { api } from "~/trpc/react";
+import type { StoryForProfile } from "~/server/api/routers/stories";
+
+// Helper function to render nice labels for stage
+function formatStageLabel(stage: string): string {
+  const labels: Record<string, string> = {
+    Student: "Student",
+    NewGrad: "New grad",
+    CareerSwitch: "Career switch",
+    MidCareer: "Mid-career",
+  };
+  return labels[stage] ?? stage;
+}
 
 export default function ResultsPage({
   params,
@@ -23,6 +35,26 @@ export default function ResultsPage({
     isLoading: pathsLoading,
     error: pathsError,
   } = api.recommendation.getPathsForProfile.useQuery({ profileId });
+
+  // Stories mutation and state
+  const generateStories = api.stories.generateForProfile.useMutation();
+  const [stories, setStories] = useState<StoryForProfile[] | null>(null);
+  const [storiesLoaded, setStoriesLoaded] = useState(false);
+
+  // Generate stories once profile is loaded
+  useEffect(() => {
+    if (profile && !storiesLoaded && !generateStories.isPending) {
+      setStoriesLoaded(true);
+      generateStories.mutate(
+        { profileId },
+        {
+          onSuccess: (data) => {
+            setStories(data);
+          },
+        }
+      );
+    }
+  }, [profile, profileId, storiesLoaded, generateStories]);
 
   const isLoading = profileLoading || pathsLoading;
   const hasError = profileError || pathsError;
@@ -238,10 +270,130 @@ export default function ResultsPage({
               Browse all paths →
             </Link>
           </div>
+
+          {/* Real Stories Section */}
+          <div className="mt-12">
+            <div className="mb-6">
+              <h2
+                className="text-xl font-medium text-black mb-2"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Real stories for your situation
+              </h2>
+              <p className="text-sm text-neutral-500">
+                Examples of people with similar backgrounds and constraints. In the future,
+                these will come from live searches across YouTube, LinkedIn, blogs, and more.
+              </p>
+            </div>
+
+            {/* Stories loading state */}
+            {generateStories.isPending && (
+              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-8 text-center">
+                <div className="animate-pulse">
+                  <div className="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-sm text-neutral-500">Finding relevant stories...</p>
+                </div>
+              </div>
+            )}
+
+            {/* Stories error state */}
+            {generateStories.isError && (
+              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-6 text-center">
+                <p className="text-sm text-neutral-500">
+                  We couldn't load stories right now. Try again later.
+                </p>
+              </div>
+            )}
+
+            {/* Stories success state */}
+            {stories && stories.length > 0 && (
+              <div className="space-y-4">
+                {stories.map((story) => (
+                  <div
+                    key={story.id}
+                    className="bg-white border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <h3
+                        className="text-lg font-medium text-black"
+                        style={{ fontFamily: "var(--font-heading)" }}
+                      >
+                        {story.title}
+                      </h3>
+                      <SourceTypeBadge type={story.sourceType} />
+                    </div>
+
+                    <p className="text-sm text-neutral-600 leading-relaxed mb-3">
+                      {story.shortSummary}
+                    </p>
+
+                    <p className="text-xs text-neutral-400 italic mb-4">
+                      {story.whyItMatches}
+                    </p>
+
+                    <a
+                      href={story.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-sm text-black hover:underline"
+                    >
+                      <span
+                        style={{ fontFamily: "var(--font-mono)" }}
+                        className="tracking-wide"
+                      >
+                        Open source
+                      </span>
+                      <svg
+                        className="ml-2 w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* No stories state */}
+            {stories && stories.length === 0 && (
+              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-6 text-center">
+                <p className="text-sm text-neutral-500">
+                  No stories found for your profile yet.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
       <Footer />
     </div>
+  );
+}
+
+// Source Type Badge Component
+function SourceTypeBadge({ type }: { type: string }) {
+  const labels: Record<string, string> = {
+    video: "Video",
+    article: "Article",
+    linkedin: "LinkedIn",
+    other: "Other",
+  };
+
+  return (
+    <span
+      className="flex-shrink-0 text-xs px-2 py-1 bg-neutral-100 text-neutral-500 rounded"
+      style={{ fontFamily: "var(--font-mono)" }}
+    >
+      {labels[type] ?? "Other"}
+    </span>
   );
 }
 
@@ -256,6 +408,7 @@ function ProfileSummary({
     interests: string;
     name?: string | null;
     location?: string | null;
+    extraInfo?: string | null;
   };
 }) {
   return (
@@ -277,7 +430,7 @@ function ProfileSummary({
         </div>
         <div>
           <p className="text-xs text-neutral-400 mb-1">Stage</p>
-          <p className="text-sm text-black font-medium">{profile.stage}</p>
+          <p className="text-sm text-black font-medium">{formatStageLabel(profile.stage)}</p>
         </div>
         <div>
           <p className="text-xs text-neutral-400 mb-1">Interests</p>
@@ -286,6 +439,12 @@ function ProfileSummary({
           </p>
         </div>
       </div>
+      {profile.extraInfo && profile.extraInfo.trim() && (
+        <div className="mt-4 pt-4 border-t border-neutral-200">
+          <p className="text-xs text-neutral-400 mb-1">Extra Context</p>
+          <p className="text-sm text-black">{profile.extraInfo}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -343,4 +502,3 @@ function Footer() {
     </footer>
   );
 }
-

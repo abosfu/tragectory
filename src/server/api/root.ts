@@ -2,6 +2,7 @@ import { pathsRouter } from "~/server/api/routers/paths";
 import { caseStudiesRouter } from "~/server/api/routers/caseStudies";
 import { profileRouter } from "~/server/api/routers/profile";
 import { recommendationRouter } from "~/server/api/routers/recommendation";
+import { storiesRouter } from "~/server/api/routers/stories";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -14,9 +15,10 @@ export const appRouter = createTRPCRouter({
   paths: pathsRouter,
   caseStudies: caseStudiesRouter,
 
-  // New routers (DB-backed, for Phase 2 integration)
+  // DB-backed routers
   profile: profileRouter,
   recommendation: recommendationRouter,
+  stories: storiesRouter,
 });
 
 // export type definition of API

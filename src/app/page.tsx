@@ -4,14 +4,26 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 
+type Stage = "Student" | "NewGrad" | "CareerSwitch" | "MidCareer";
+
 export default function HomePage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    studying: string;
+    roles: string;
+    location: string;
+    timeline: string;
+    extraInfo: string;
+    stage: Stage | "";
+  }>({
     name: "",
     studying: "",
     roles: "",
     location: "",
     timeline: "",
+    extraInfo: "",
+    stage: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +50,10 @@ export default function HomePage() {
       setError("Please provide your timeline.");
       return;
     }
+    if (!formData.stage) {
+      setError("Please select where you are in your journey.");
+      return;
+    }
 
     try {
       // 1. Create the user profile
@@ -47,7 +63,8 @@ export default function HomePage() {
         interests: formData.roles,
         location: formData.location || undefined,
         timeline: formData.timeline,
-        stage: "Student", // Hard-coded for v1
+        stage: formData.stage,
+        extraInfo: formData.extraInfo || undefined,
       });
 
       // 2. Generate paths for this profile
@@ -225,6 +242,39 @@ export default function HomePage() {
 
                   <div className="space-y-1.5">
                     <label
+                      htmlFor="stage"
+                      className="block text-sm text-neutral-600 font-medium"
+                    >
+                      Where are you in your journey?
+                    </label>
+                    <select
+                      id="stage"
+                      value={formData.stage}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          stage: e.target.value as Stage | "",
+                        })
+                      }
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: "right 0.75rem center",
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: "1.25rem 1.25rem",
+                      }}
+                    >
+                      <option value="">Select your stage</option>
+                      <option value="Student">Student</option>
+                      <option value="NewGrad">New grad</option>
+                      <option value="CareerSwitch">Career switch</option>
+                      <option value="MidCareer">Mid-career</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
                       htmlFor="roles"
                       className="block text-sm text-neutral-600 font-medium"
                     >
@@ -239,6 +289,28 @@ export default function HomePage() {
                       disabled={isLoading}
                       className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., Software development, product management..."
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="extraInfo"
+                      className="block text-sm text-neutral-600 font-medium"
+                    >
+                      Anything else you want to share?{" "}
+                      <span className="text-neutral-400 font-normal">
+                        (optional)
+                      </span>
+                    </label>
+                    <textarea
+                      id="extraInfo"
+                      value={formData.extraInfo}
+                      onChange={(e) =>
+                        setFormData({ ...formData, extraInfo: e.target.value })
+                      }
+                      disabled={isLoading}
+                      className="w-full min-h-[70px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="Unique situation, constraints, multiple interests, family/financial limitations..."
                     />
                   </div>
 
