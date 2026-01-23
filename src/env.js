@@ -11,6 +11,9 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    // AI and web search API keys (optional - app works without them using mock data)
+    GEMINI_API_KEY: z.string().optional(),
+    WEB_SEARCH_API_KEY: z.string().optional(),
   },
 
   /**
@@ -29,6 +32,8 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    WEB_SEARCH_API_KEY: process.env.WEB_SEARCH_API_KEY,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

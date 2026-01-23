@@ -56,7 +56,7 @@ export const recommendationRouter = createTRPCRouter({
         {
           userProfileId: input.profileId,
           aiLabel: "Conventional Path",
-          aiExplanation: `Based on your background as "${profile.currentStatus}", this path follows a traditional trajectory in your field. It emphasizes building core skills and gaining experience through established channels.`,
+          aiExplanation: `Based on your background in ${profile.currentStatus}, this path follows a traditional trajectory in your field. It emphasizes building core skills and gaining experience through established channels.`,
           targetRole: "Industry Standard Role",
           targetIndustry: null,
           rank: 1,
@@ -64,7 +64,7 @@ export const recommendationRouter = createTRPCRouter({
         {
           userProfileId: input.profileId,
           aiLabel: "Project & Portfolio Heavy",
-          aiExplanation: `Given your interests in "${profile.interests}", this path focuses on building a strong portfolio of personal projects and open-source contributions to demonstrate your capabilities.`,
+          aiExplanation: `Given your interests in ${profile.interests}, this path focuses on building a strong portfolio of personal projects and contributions to demonstrate your capabilities.`,
           targetRole: "Self-Directed Builder",
           targetIndustry: null,
           rank: 2,
@@ -72,7 +72,7 @@ export const recommendationRouter = createTRPCRouter({
         {
           userProfileId: input.profileId,
           aiLabel: "Unconventional / Cross-Discipline",
-          aiExplanation: `For someone at the "${profile.stage}" stage with your timeline of "${profile.timeline}", this path explores non-traditional routes that combine multiple domains or leverage transferable skills.`,
+          aiExplanation: `For someone at the ${profile.stage} stage with your timeline of ${profile.timeline}, this path explores non-traditional routes that combine multiple domains or leverage transferable skills.`,
           targetRole: "Hybrid Role",
           targetIndustry: null,
           rank: 3,
