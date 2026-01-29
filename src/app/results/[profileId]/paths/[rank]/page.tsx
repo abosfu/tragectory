@@ -239,21 +239,6 @@ export default function PathDetailPage({
             {/* Stories success state */}
             {stories && stories.length > 0 && (
               <div className="space-y-4">
-                {/* Debug indicator - shows if data is from API or mock */}
-                {stories.some((s) => s.id.startsWith("mock-")) && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-yellow-800 font-mono">
-                      ⚠️ DEBUG: Showing MOCK stories (API keys missing or pipeline failed)
-                    </p>
-                  </div>
-                )}
-                {!stories.some((s) => s.id.startsWith("mock-")) && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-green-800 font-mono">
-                      ✅ DEBUG: Showing REAL API-generated stories
-                    </p>
-                  </div>
-                )}
                 {stories.map((story) => (
                   <div
                     key={story.id}

@@ -261,19 +261,6 @@ export default function ResultsPage({
               ))}
             </div>
           </div>
-
-          {/* CTA to explore more */}
-          <div className="mt-12 p-6 bg-neutral-50 rounded-xl border border-neutral-200 text-center">
-            <p className="text-neutral-500 text-sm mb-4">
-              Want to see real case studies for these paths?
-            </p>
-            <Link
-              href="/paths"
-              className="inline-flex items-center justify-center bg-black text-white hover:bg-neutral-800 h-10 px-6 text-sm font-medium rounded-lg transition-colors"
-            >
-              Browse all paths →
-            </Link>
-          </div>
         </div>
       </main>
       <Footer />
