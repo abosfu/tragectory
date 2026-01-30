@@ -99,6 +99,41 @@ async function webSearchForStories(opts: {
 }
 
 // ============================================================================
+// PATH-AWARE RESULT SELECTION HELPER
+// ============================================================================
+
+/**
+ * Select a path-specific slice of Tavily search results.
+ * This ensures different paths show different stories even from the same search.
+ */
+function selectSearchResultsForPath(opts: {
+  searchResults: RawSearchResult[];
+  limit?: number;
+  pathRank?: number;
+}): RawSearchResult[] {
+  const limit = opts.limit ?? 4;
+  const total = opts.searchResults.length;
+  let selected: RawSearchResult[] = [];
+
+  // Simple heuristic to vary which results are shown per path:
+  // - Path 1 (Conventional): earliest results
+  // - Path 2 (Project & Portfolio Heavy): middle chunk
+  // - Path 3 (Unconventional / Cross-Discipline): later results
+  if (opts.pathRank === 2 && total > limit * 2) {
+    const start = Math.floor(total / 3);
+    selected = opts.searchResults.slice(start, start + limit);
+  } else if (opts.pathRank === 3 && total > limit * 2) {
+    const start = Math.max(total - limit - 2, 0);
+    selected = opts.searchResults.slice(start, start + limit);
+  } else {
+    // Default / Path 1 or insufficient results: use first chunk
+    selected = opts.searchResults.slice(0, limit);
+  }
+
+  return selected;
+}
+
+// ============================================================================
 // SEARCH RESULT → STORY HELPER (Tavily-only fallback)
 // ============================================================================
 
@@ -120,24 +155,13 @@ function buildStoriesFromSearchResults(opts: {
 }): StoryForProfile[] {
   const { profile, searchResults } = opts;
   const limit = opts.limit ?? 4;
-  const total = searchResults.length;
 
-  let selected: RawSearchResult[] = [];
-
-  // Simple heuristic to vary which results are shown per path:
-  // - Path 1 (Conventional): earliest results
-  // - Path 2 (Project & Portfolio Heavy): middle chunk
-  // - Path 3 (Unconventional / Cross-Discipline): later results
-  if (opts.pathRank === 2 && total > limit * 2) {
-    const start = Math.floor(total / 3);
-    selected = searchResults.slice(start, start + limit);
-  } else if (opts.pathRank === 3 && total > limit * 2) {
-    const start = Math.max(total - limit - 2, 0);
-    selected = searchResults.slice(start, start + limit);
-  } else {
-    // Default / Path 1 or insufficient results: use first chunk
-    selected = searchResults.slice(0, limit);
-  }
+  // Use the path-aware selection helper
+  const selected = selectSearchResultsForPath({
+    searchResults,
+    limit,
+    pathRank: opts.pathRank,
+  });
 
   return selected.map((r, index) => {
     const url = (r.url ?? "").toLowerCase();
@@ -170,12 +194,28 @@ function pathRankLabel(pathRank?: number): string {
 }
 
 // ============================================================================
-// GEMINI AI HELPER
+// GEMINI AI SUMMARIZER HELPER
 // ============================================================================
 
 /**
- * Use Gemini AI to generate personalized stories from search results
- * Returns empty array on any error (caller should handle fallback)
+ * Helper to infer sourceType from URL
+ */
+function inferSourceType(url: string): "video" | "article" | "linkedin" | "other" {
+  const lower = url.toLowerCase();
+  if (lower.includes("youtube.com") || lower.includes("youtu.be") || lower.includes("vimeo.com")) {
+    return "video";
+  }
+  if (lower.includes("linkedin.com")) {
+    return "linkedin";
+  }
+  return "article";
+}
+
+/**
+ * Use Gemini AI to summarize Tavily search results and write personalized summaries.
+ * Takes Tavily results (title, URL, snippet) and returns StoryForProfile[] with
+ * Gemini-written shortSummary and whyItMatches.
+ * Returns empty array on any error (caller should handle fallback).
  */
 async function generateStoriesWithGemini(opts: {
   profile: {
@@ -185,19 +225,30 @@ async function generateStoriesWithGemini(opts: {
     stage: string;
     extraInfo?: string | null;
   };
-  searchResults: RawSearchResult[];
+  pathRank?: number;
+  pathLabel?: string;
+  results: RawSearchResult[];
   apiKey: string;
 }): Promise<StoryForProfile[]> {
   try {
+    console.log("[stories] gemini summarize input", {
+      resultsCount: opts.results.length,
+      pathRank: opts.pathRank,
+      pathLabel: opts.pathLabel,
+    });
+
+    // Build path label
+    const pathLabelText = opts.pathLabel || pathRankLabel(opts.pathRank);
+
     // Build search results text for prompt
-    const searchResultsText = opts.searchResults
+    const searchResultsText = opts.results
       .map(
         (r, i) =>
-          `${i + 1}. Title: ${r.title}\n   URL: ${r.url}\n   ${r.snippet ? `Snippet: ${r.snippet}\n` : ""}`
+          `${i}) Title: ${r.title || "Untitled"}\n   URL: ${r.url || ""}\n   Snippet: ${r.snippet || "No snippet available"}\n`
       )
-      .join("\n\n");
+      .join("\n");
 
-    // Build prompt asking for strict JSON output in { "stories": [...] } format
+    // Build prompt asking for summaries only
     const prompt = `You are a career advisor helping someone find relevant career transition stories.
 
 User Profile:
@@ -207,39 +258,40 @@ User Profile:
 - Stage: ${opts.profile.stage}
 ${opts.profile.extraInfo ? `- Extra Context: ${opts.profile.extraInfo}` : ""}
 
-Here are ${opts.searchResults.length} search results about career transitions:
+Current path: ${pathLabelText}
+
+Here are ${opts.results.length} search results:
 
 ${searchResultsText}
 
 Your task:
-1. Select the 3-5 BEST stories that match this user's situation
-2. For each story, infer the sourceType from the URL:
-   - "video" if URL contains youtube.com, youtu.be, vimeo.com, or similar video platforms
-   - "linkedin" if URL contains linkedin.com
-   - "article" for blog posts, Medium, news sites, etc.
-   - "other" for anything else
-3. Generate a shortSummary (2-4 sentences) explaining the story
-4. Generate a whyItMatches (1-2 sentences) explaining why this story is relevant to THIS specific user
+For each result (indexed 0 to ${opts.results.length - 1}), write:
+1. shortSummary: 2-3 sentences summarizing this specific article/video/story
+2. whyItMatches: 1-2 sentences explaining why this story is relevant to THIS user profile and THIS path
 
-Return ONLY valid JSON in this exact shape: { "stories": [ ... ] } (no markdown, no code fences, no commentary):
+Return ONLY valid JSON in this exact shape (no markdown, no code fences, no commentary):
 {
   "stories": [
     {
-      "id": "story-1",
-      "title": "Story title here",
-      "sourceUrl": "https://...",
-      "sourceType": "article",
-      "shortSummary": "2-4 sentence summary...",
-      "whyItMatches": "Why this matches the user..."
+      "index": 0,
+      "shortSummary": "2-3 sentence summary of this specific link",
+      "whyItMatches": "1-2 sentences tailored to THIS user and THIS path"
+    },
+    {
+      "index": 1,
+      "shortSummary": "...",
+      "whyItMatches": "..."
     }
   ]
 }
 
-Make sure sourceType is one of: "video", "article", "linkedin", "other".`;
+Make sure you return one entry per result, with the index matching the result order above.`;
 
     // Call Gemini REST API with JSON mode
-    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + opts.apiKey;
-    
+    const apiUrl =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+      opts.apiKey;
+
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -263,7 +315,7 @@ Make sure sourceType is one of: "video", "article", "linkedin", "other".`;
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "Unknown error");
-      console.warn("[stories] error - Gemini API HTTP error", {
+      console.warn("[stories] Gemini summarize HTTP error", {
         status: response.status,
         error: errorText.slice(0, 500),
       });
@@ -282,11 +334,11 @@ Make sure sourceType is one of: "video", "article", "linkedin", "other".`;
 
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     if (!rawText) {
-      console.warn("[stories] error - Gemini returned empty response");
+      console.warn("[stories] Gemini summarize returned empty response");
       return [];
     }
 
-    console.log("[stories] raw Gemini output (trimmed)", rawText.slice(0, 300));
+    console.log("[stories] raw Gemini summarize output (trimmed)", rawText.slice(0, 300));
 
     // Parse JSON - strip code fences if Gemini ignored response_mime_type
     let jsonText = rawText.trim();
@@ -300,7 +352,7 @@ Make sure sourceType is one of: "video", "article", "linkedin", "other".`;
     try {
       parsed = JSON.parse(jsonText);
     } catch (err) {
-      console.warn("[stories] error - JSON parse failed", {
+      console.warn("[stories] Gemini summarize parse error", {
         message: err instanceof Error ? err.message : String(err),
         jsonPreview: jsonText.slice(0, 200),
       });
@@ -312,46 +364,54 @@ Make sure sourceType is one of: "video", "article", "linkedin", "other".`;
       typeof parsed !== "object" ||
       !Array.isArray((parsed as any).stories)
     ) {
-      console.warn("[stories] error - Gemini returned JSON without 'stories' array");
+      console.warn("[stories] Gemini summarize returned JSON without 'stories' array");
       return [];
     }
 
-    const stories = (parsed as { stories: StoryForProfile[] }).stories;
-    console.log("[stories] parsed Gemini stories", stories.length);
+    const geminiStories = (parsed as {
+      stories: Array<{
+        index: number;
+        shortSummary: string;
+        whyItMatches: string;
+      }>;
+    }).stories;
 
-    // Validate and filter stories - ensure required fields and valid sourceType
-    const validStories = stories
-      .filter((s) => {
-        if (!s.id || !s.title || !s.sourceUrl || !s.shortSummary || !s.whyItMatches) {
-          return false;
-        }
-        
-        // Infer sourceType from URL if not provided or invalid
-        if (!s.sourceType || !["video", "article", "linkedin", "other"].includes(s.sourceType)) {
-          const url = s.sourceUrl.toLowerCase();
-          if (url.includes("youtube.com") || url.includes("youtu.be") || url.includes("vimeo.com")) {
-            s.sourceType = "video";
-          } else if (url.includes("linkedin.com")) {
-            s.sourceType = "linkedin";
-          } else {
-            s.sourceType = "article";
-          }
-        }
-        
-        return true;
-      })
-      .map((s) => ({
-        id: s.id!,
-        title: s.title!,
-        sourceUrl: s.sourceUrl!,
-        sourceType: s.sourceType as "video" | "article" | "linkedin" | "other",
-        shortSummary: s.shortSummary!,
-        whyItMatches: s.whyItMatches!,
-      }));
+    // Map Gemini summaries back to StoryForProfile[] using Tavily data
+    const mappedStories: StoryForProfile[] = [];
 
-    return validStories;
+    for (const story of geminiStories) {
+      const index = story.index;
+      if (index < 0 || index >= opts.results.length) {
+        console.warn(`[stories] Gemini story index ${index} out of range, skipping`);
+        continue;
+      }
+
+      const r = opts.results[index];
+      if (!r.url || !r.title) {
+        console.warn(`[stories] Gemini story index ${index} missing URL or title, skipping`);
+        continue;
+      }
+
+      if (!story.shortSummary || !story.whyItMatches) {
+        console.warn(`[stories] Gemini story index ${index} missing summary fields, skipping`);
+        continue;
+      }
+
+      mappedStories.push({
+        id: `gemini-${opts.pathRank ?? 1}-${index}`,
+        title: r.title,
+        sourceUrl: r.url,
+        sourceType: inferSourceType(r.url),
+        shortSummary: story.shortSummary,
+        whyItMatches: story.whyItMatches,
+      });
+    }
+
+    console.log("[stories] parsed Gemini stories", mappedStories.length);
+
+    return mappedStories;
   } catch (error) {
-    console.warn("[stories] error - Gemini generation exception", {
+    console.warn("[stories] Gemini summarize exception", {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
@@ -465,7 +525,7 @@ export const storiesRouter = createTRPCRouter({
         return [getPlaceholderStory("no-keys")];
       }
 
-      // Case B: Keys are present - use Tavily web search pipeline (Gemini temporarily bypassed)
+      // Case B: Keys are present - use Tavily web search + Gemini summarizer
       // 3. Build path-specific modifiers based on which path the user clicked
       const pathRank = input.pathRank ?? 1;
       const pathLabel = input.pathLabel ?? "";
@@ -517,7 +577,7 @@ export const storiesRouter = createTRPCRouter({
         searchQuery,
       });
 
-      // 4. Search the web
+      // 5. Search the web
       const searchResults = await webSearchForStories({
         query: searchQuery,
         apiKey: webSearchKey,
@@ -531,8 +591,66 @@ export const storiesRouter = createTRPCRouter({
         return [getPlaceholderStory("no-search-results")];
       }
 
-      // 5. For now, bypass Gemini and build stories directly from Tavily results
-      const storiesFromSearch = buildStoriesFromSearchResults({
+      // 6. Select path-specific results
+      const selectedResults = selectSearchResultsForPath({
+        searchResults,
+        limit: 4,
+        pathRank,
+      });
+
+      // 7. Try Gemini summarizer if key exists, otherwise fall back to Tavily-only
+      if (!geminiKey) {
+        console.warn("[stories] no GEMINI_API_KEY, using Tavily-only summaries");
+        const storiesFromSearch = buildStoriesFromSearchResults({
+          profile: {
+            currentStatus: profile.currentStatus,
+            interests: profile.interests,
+            timeline: profile.timeline,
+            stage: profile.stage,
+            extraInfo: profile.extraInfo,
+          },
+          searchResults: selectedResults,
+          limit: 4,
+          pathRank,
+        });
+
+        if (storiesFromSearch.length === 0) {
+          return [getPlaceholderStory("no-search-results")];
+        }
+
+        // Optional: save to DB
+        try {
+          await Promise.all(
+            storiesFromSearch.map((story) =>
+              db.caseStudy.create({
+                data: {
+                  sourceUrl: story.sourceUrl,
+                  sourceType: story.sourceType,
+                  title: story.title,
+                  shortSummary: story.shortSummary,
+                  tags: "tavily-only",
+                  stage: profile.stage,
+                  fetchedAt: new Date(),
+                },
+              }).catch((err) => {
+                if (err.code !== "P2002") {
+                  console.warn("[stories] error - failed to save story to DB", {
+                    title: story.title,
+                    error: err,
+                  });
+                }
+              })
+            )
+          );
+        } catch (dbError) {
+          console.warn("[stories] error - DB save failed", dbError);
+        }
+
+        return storiesFromSearch;
+      }
+
+      // 8. Call Gemini summarizer
+      const aiStories = await generateStoriesWithGemini({
         profile: {
           currentStatus: profile.currentStatus,
           interests: profile.interests,
@@ -540,32 +658,82 @@ export const storiesRouter = createTRPCRouter({
           stage: profile.stage,
           extraInfo: profile.extraInfo,
         },
-        searchResults,
-        limit: 4,
         pathRank,
+        pathLabel: input.pathLabel,
+        results: selectedResults,
+        apiKey: geminiKey,
       });
 
-      if (storiesFromSearch.length === 0) {
-        console.warn("[stories] search fallback produced no stories, using placeholder");
-        return [getPlaceholderStory("no-search-results")];
+      // 9. Fallback logic: if Gemini fails, use Tavily-only summaries
+      if (aiStories.length === 0) {
+        console.warn(
+          "[stories] Gemini summarizer returned no stories, falling back to Tavily-only summaries"
+        );
+        const storiesFromSearch = buildStoriesFromSearchResults({
+          profile: {
+            currentStatus: profile.currentStatus,
+            interests: profile.interests,
+            timeline: profile.timeline,
+            stage: profile.stage,
+            extraInfo: profile.extraInfo,
+          },
+          searchResults: selectedResults,
+          limit: 4,
+          pathRank,
+        });
+
+        if (storiesFromSearch.length === 0) {
+          return [getPlaceholderStory("no-search-results")];
+        }
+
+        // Optional: save to DB
+        try {
+          await Promise.all(
+            storiesFromSearch.map((story) =>
+              db.caseStudy.create({
+                data: {
+                  sourceUrl: story.sourceUrl,
+                  sourceType: story.sourceType,
+                  title: story.title,
+                  shortSummary: story.shortSummary,
+                  tags: "tavily-only-fallback",
+                  stage: profile.stage,
+                  fetchedAt: new Date(),
+                },
+              }).catch((err) => {
+                if (err.code !== "P2002") {
+                  console.warn("[stories] error - failed to save story to DB", {
+                    title: story.title,
+                    error: err,
+                  });
+                }
+              })
+            )
+          );
+        } catch (dbError) {
+          console.warn("[stories] error - DB save failed", dbError);
+        }
+
+        return storiesFromSearch;
       }
 
+      // 10. Success: return Gemini-summarized stories
       console.log(
         "[stories] success - returning Tavily-based stories",
-        storiesFromSearch.length,
+        aiStories.length,
       );
 
-      // 6. (Optional) Store successful stories in CaseStudy table for historical tracking
+      // Optional: save to DB
       try {
         await Promise.all(
-          storiesFromSearch.map((story) =>
+          aiStories.map((story) =>
             db.caseStudy.create({
               data: {
                 sourceUrl: story.sourceUrl,
                 sourceType: story.sourceType,
                 title: story.title,
                 shortSummary: story.shortSummary,
-                tags: "ai-ingested",
+                tags: "gemini-summarized",
                 stage: profile.stage,
                 fetchedAt: new Date(),
               },
@@ -585,6 +753,6 @@ export const storiesRouter = createTRPCRouter({
         console.warn("[stories] error - DB save failed", dbError);
       }
 
-      return storiesFromSearch;
+      return aiStories;
     }),
 });
