@@ -2,7 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Poppins } from "next/font/google";
 import { api } from "~/trpc/react";
+
+const poppins = Poppins({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 type Stage = "Student" | "NewGrad" | "CareerSwitch" | "MidCareer";
 
@@ -79,29 +86,24 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[var(--page-bg)] flex flex-col">
       {/* Header */}
-      <header className="border-b border-neutral-200">
+      <header className="border-b border-neutral-200/60">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div
+            <a
+              href="/"
               className="text-sm tracking-[0.25em] uppercase text-black font-medium"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               TRAJECTORY
-            </div>
+            </a>
             <nav className="hidden md:flex items-center gap-8">
               <a
-                href="#about"
-                className="text-sm text-neutral-500 hover:text-black transition-colors"
+                href="/about"
+                className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors border-b border-transparent hover:border-secondary"
               >
                 About
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-sm text-neutral-500 hover:text-black transition-colors"
-              >
-                How it works
               </a>
             </nav>
           </div>
@@ -109,103 +111,59 @@ export default function HomePage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 py-16 lg:py-24">
-            {/* Left Column - Hero Content */}
-            <div className="flex flex-col justify-center">
-              <div className="space-y-6">
-                <div
-                  className="inline-block text-xs tracking-[0.2em] uppercase text-neutral-500 px-3 py-1.5 bg-neutral-100 rounded-full"
-                  style={{ fontFamily: "var(--font-mono)" }}
-                >
-                  Career Explorer
-                </div>
-                <h1
-                  className="text-4xl lg:text-5xl xl:text-6xl text-black font-medium leading-[1.1] tracking-tight"
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
-                  Explore different paths your career could take.
-                </h1>
-                <p className="text-lg text-neutral-500 leading-relaxed max-w-lg">
-                  Discover structured career and co-op paths with real case
-                  studies from people who've navigated similar journeys. See
-                  what's possible from where you are now.
-                </p>
-              </div>
+      <main className="flex-1 relative">
+        {/* Background Watermark */}
+        <div className="pointer-events-none select-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute left-1/2 -translate-x-1/2 top-40 text-[7rem] md:text-[8rem] font-semibold tracking-tight" style={{ color: 'rgba(12, 10, 9, 0.02)' }}>
+            GAIN CLARITY
+          </div>
+          <div className="absolute left-1/2 -translate-x-1/2 top-[800px] text-[7rem] md:text-[8rem] font-semibold tracking-tight" style={{ color: 'rgba(12, 10, 9, 0.02)' }}>
+            BUILD MOMENTUM
+          </div>
+        </div>
 
-              {/* Features */}
-              <div className="mt-12 grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-black"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-medium text-black">Multiple Paths</h3>
-                  <p className="text-sm text-neutral-500">
-                    Compare different career directions side by side
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-black"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-medium text-black">Real Stories</h3>
-                  <p className="text-sm text-neutral-500">
-                    Learn from actual case studies and experiences
-                  </p>
-                </div>
-              </div>
+        {/* Section 1: Hero + Story */}
+        <section className="relative">
+          <div className="mx-auto max-w-4xl px-6 py-24 md:py-32">
+            <div className="text-center">
+              <h1
+                className={`text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-black ${poppins.className}`}
+              >
+                Design the next chapter of your career.
+              </h1>
+              <p className="mt-4 max-w-2xl text-base sm:text-lg text-neutral-600 mx-auto">
+                See three tailored paths based on where you are right now, with real examples instead of generic advice.
+              </p>
+              <p className="mt-6 max-w-2xl text-base sm:text-lg text-neutral-600 mx-auto leading-relaxed">
+                Trajectory helps you stop guessing about your next move. Answer a few questions and compare three paths — a conventional route, a project-heavy route, and an unconventional route — so you leave with real clarity, not more confusion.
+              </p>
+              <p className="mt-6 text-xs uppercase tracking-[0.2em] text-neutral-400">
+                Scroll to answer a few quick questions.
+              </p>
             </div>
+          </div>
+        </section>
 
-            {/* Right Column - Form */}
-            <div className="flex items-center">
-              <div className="w-full bg-neutral-50 rounded-2xl p-8 lg:p-10 border border-neutral-200">
-                <div className="mb-8">
-                  <h2
-                    className="text-2xl font-medium text-black mb-2"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                  >
-                    Get started
-                  </h2>
-                  <p className="text-neutral-500 text-sm">
-                    Tell us a bit about yourself to see relevant paths.
+        {/* Section 2: Form + Features */}
+        <section className="w-full py-16">
+          <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 md:flex-row md:items-start">
+            {/* Left Column: Form */}
+            <div className="w-full max-w-xl">
+              <div className="rounded-2xl px-6 py-8 sm:px-8 sm:py-9">
+                <div className="mb-6 text-center">
+                  <h2 className="text-lg font-medium text-black">Get started</h2>
+                  <p className="mt-1 text-xs text-neutral-400 text-center">
+                    A few quick questions. Then we'll show you 3 paths that fit.
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <label
                       htmlFor="name"
-                      className="block text-sm text-neutral-600 font-medium"
+                      className="block text-sm text-neutral-700 font-medium"
                     >
-                      Name{" "}
-                      <span className="text-neutral-400 font-normal">
-                        (optional)
-                      </span>
+                      Name (optional)
                     </label>
                     <input
                       id="name"
@@ -215,7 +173,7 @@ export default function HomePage() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Your name"
                     />
                   </div>
@@ -223,7 +181,7 @@ export default function HomePage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="studying"
-                      className="block text-sm text-neutral-600 font-medium"
+                      className="block text-sm text-neutral-700 font-medium"
                     >
                       What are you studying or working on?
                     </label>
@@ -235,15 +193,15 @@ export default function HomePage() {
                         setFormData({ ...formData, studying: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      placeholder="e.g., Computer Science, Marketing"
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="e.g., CS, Marketing"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <label
                       htmlFor="stage"
-                      className="block text-sm text-neutral-600 font-medium"
+                      className="block text-sm text-neutral-700 font-medium"
                     >
                       Where are you in your journey?
                     </label>
@@ -257,7 +215,7 @@ export default function HomePage() {
                         })
                       }
                       disabled={isLoading}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                         backgroundPosition: "right 0.75rem center",
@@ -276,9 +234,9 @@ export default function HomePage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="roles"
-                      className="block text-sm text-neutral-600 font-medium"
+                      className="block text-sm text-neutral-700 font-medium"
                     >
-                      What types of roles interest you?
+                      What roles are you curious about?
                     </label>
                     <textarea
                       id="roles"
@@ -287,20 +245,60 @@ export default function HomePage() {
                         setFormData({ ...formData, roles: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      placeholder="e.g., Software development, product management..."
+                      className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="e.g., product, SWE, sales"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="timeline"
+                      className="block text-sm text-neutral-700 font-medium"
+                    >
+                      Timeline
+                    </label>
+                    <input
+                      id="timeline"
+                      type="text"
+                      value={formData.timeline}
+                      onChange={(e) =>
+                        setFormData({ ...formData, timeline: e.target.value })
+                      }
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="e.g., next 6–12 months"
+                    />
+                    <p className="text-xs text-neutral-400 mt-1">
+                      When do you want to make a move?
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="location"
+                      className="block text-sm text-neutral-700 font-medium"
+                    >
+                      Location
+                    </label>
+                    <input
+                      id="location"
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="e.g., Toronto"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <label
                       htmlFor="extraInfo"
-                      className="block text-sm text-neutral-600 font-medium"
+                      className="block text-sm text-neutral-700 font-medium"
                     >
-                      Anything else you want to share?{" "}
-                      <span className="text-neutral-400 font-normal">
-                        (optional)
-                      </span>
+                      Anything unique about your situation? (optional)
                     </label>
                     <textarea
                       id="extraInfo"
@@ -309,54 +307,11 @@ export default function HomePage() {
                         setFormData({ ...formData, extraInfo: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full min-h-[70px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      placeholder="Unique situation, constraints, multiple interests, family/financial limitations..."
+                      className="w-full min-h-[70px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="e.g., visa, family, GPA, money"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="location"
-                        className="block text-sm text-neutral-600 font-medium"
-                      >
-                        Location
-                      </label>
-                      <input
-                        id="location"
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) =>
-                          setFormData({ ...formData, location: e.target.value })
-                        }
-                        disabled={isLoading}
-                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        placeholder="e.g., Toronto"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="timeline"
-                        className="block text-sm text-neutral-600 font-medium"
-                      >
-                        Timeline
-                      </label>
-                      <input
-                        id="timeline"
-                        type="text"
-                        value={formData.timeline}
-                        onChange={(e) =>
-                          setFormData({ ...formData, timeline: e.target.value })
-                        }
-                        disabled={isLoading}
-                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        placeholder="Next 6-12 months"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Error message */}
                   {error && (
                     <p className="text-sm text-red-600">{error}</p>
                   )}
@@ -364,19 +319,72 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-black text-white hover:bg-neutral-800 h-12 text-sm font-medium rounded-lg transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-4 py-3 text-sm font-medium text-white hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? "Creating your paths..." : "See possible paths →"}
+                    {isLoading ? "Creating your paths..." : "Show me my paths →"}
                   </button>
+                  <p className="mt-2 text-xs text-neutral-400 text-center">
+                    Under 60 seconds. 3 paths with pros, cons, and examples.
+                  </p>
                 </form>
+                </div>
               </div>
-            </div>
+
+              {/* Right Column: Features */}
+              <div className="w-full md:flex-1 space-y-4">
+                <div className="flex flex-col gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-sm font-medium text-neutral-900">
+                    Compare 3 paths side-by-side
+                  </h3>
+                  <p className="text-sm text-neutral-500">
+                    See how each path changes your skills, timeline, and options.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-sm font-medium text-neutral-900">
+                    Real examples, not generic advice
+                  </h3>
+                  <p className="text-sm text-neutral-500">
+                    Pulled from real case studies, job posts, and people like you.
+                  </p>
+                </div>
+              </div>
           </div>
-        </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-200">
+      <footer className="border-t border-neutral-200/60">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div
@@ -385,9 +393,6 @@ export default function HomePage() {
             >
               TRAJECTORY
             </div>
-            <p className="text-sm text-neutral-400">
-              Explore your career possibilities.
-            </p>
           </div>
         </div>
       </footer>

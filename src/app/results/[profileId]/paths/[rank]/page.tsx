@@ -55,8 +55,25 @@ export default function PathDetailPage({
     }
   );
 
+  // Fetch overview once profile and paths are loaded
+  const {
+    data: overviewData,
+    isLoading: overviewLoading,
+  } = api.stories.generateOverviewForProfile.useQuery(
+    {
+      profileId,
+      pathRank: rankNumber,
+      pathLabel: selectedPath?.aiLabel,
+    },
+    {
+      enabled: !!profile && !!paths && !Number.isNaN(rankNumber) && !!selectedPath,
+    }
+  );
+
   const isLoading = profileLoading || pathsLoading;
   const hasError = profileError || pathsError;
+
+  // Overview is now always shown if it exists (handled in the render)
 
   // Loading state
   if (isLoading) {
@@ -94,7 +111,7 @@ export default function PathDetailPage({
             </p>
             <Link
               href={`/results/${profileId}`}
-              className="inline-flex items-center justify-center bg-black text-white hover:bg-neutral-800 h-10 px-6 text-sm font-medium rounded-lg transition-colors"
+              className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
             >
               ← Back to your paths
             </Link>
@@ -114,7 +131,7 @@ export default function PathDetailPage({
           {/* Back Link */}
           <Link
             href={`/results/${profileId}`}
-            className="inline-flex items-center text-sm text-neutral-500 hover:text-black mb-6 transition-colors group"
+              className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 mb-6 transition-colors border-b border-transparent hover:border-secondary group"
           >
             <svg
               className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"
@@ -163,7 +180,13 @@ export default function PathDetailPage({
           <div className="mt-10 bg-white border border-neutral-200 rounded-xl p-6">
             <div className="flex items-start gap-4 mb-4">
               <div
-                className="flex-shrink-0 w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-sm font-medium text-black"
+                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  rankNumber === 1
+                    ? "bg-primary-soft text-primary border border-primary-border"
+                    : rankNumber === 2
+                    ? "bg-secondary-soft text-secondary-dark border border-secondary-border"
+                    : "bg-neutral-100 text-neutral-700"
+                }`}
                 style={{ fontFamily: "var(--font-mono)" }}
               >
                 {rankNumber}
@@ -183,14 +206,14 @@ export default function PathDetailPage({
                     style={{ fontFamily: "var(--font-mono)" }}
                   >
                     {selectedPath.targetRole && (
-                      <span className="bg-neutral-100 px-2 py-1 rounded">
-                        {selectedPath.targetRole}
-                      </span>
-                    )}
-                    {selectedPath.targetIndustry && (
-                      <span className="bg-neutral-100 px-2 py-1 rounded">
-                        {selectedPath.targetIndustry}
-                      </span>
+                    <span className="bg-primary-soft text-primary px-2 py-1 rounded border border-primary-border">
+                      {selectedPath.targetRole}
+                    </span>
+                  )}
+                  {selectedPath.targetIndustry && (
+                    <span className="bg-secondary-soft text-secondary-dark px-2 py-1 rounded border border-secondary-border">
+                      {selectedPath.targetIndustry}
+                    </span>
                     )}
                   </div>
                 )}
@@ -212,8 +235,9 @@ export default function PathDetailPage({
                 Real stories for this path
               </h2>
               <p className="text-sm text-neutral-500">
-                Examples of people with similar backgrounds and constraints. In the future,
-                these will come from live searches across YouTube, LinkedIn, blogs, and more.
+                {stories && stories.some((s) => s.id.startsWith("placeholder-"))
+                  ? "Examples will appear here once we can fetch and process real stories that match your profile."
+                  : "These are live examples pulled from around the web based on your profile and this path."}
               </p>
             </div>
 
@@ -233,6 +257,51 @@ export default function PathDetailPage({
                 <p className="text-sm text-neutral-500">
                   We couldn't load stories right now. Try again later.
                 </p>
+              </div>
+            )}
+
+            {/* AI Overview (Gemini) */}
+            {overviewLoading && (
+              <div className="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                <p className="text-sm text-neutral-400">Loading overview...</p>
+              </div>
+            )}
+
+            {overviewData?.overview && (
+              <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-4 text-sm leading-relaxed shadow-sm space-y-2">
+                {overviewData.overview.split("\n\n").map((block, i) => {
+                  const trimmed = block.trim();
+                  const isSummary = trimmed.startsWith("Summary:");
+                  const isNextMoves = trimmed.startsWith("Next moves:");
+
+                  if (!isSummary && !isNextMoves) {
+                    return <p key={i} className="text-neutral-700">{trimmed}</p>;
+                  }
+
+                  const [label, ...rest] = trimmed.split(":");
+                  const restText = rest.join(":").trim();
+
+                  return (
+                    <div key={i} className={`rounded-lg p-3 ${isSummary ? 'bg-primary-soft border-l-2 border-primary' : 'bg-secondary-soft border-l-2 border-secondary'}`}>
+                      <p>
+                        <span className={`font-semibold ${isSummary ? 'text-primary' : 'text-secondary-dark'}`}>
+                          {label}:
+                        </span>{" "}
+                        <span className="text-neutral-700">{restText}</span>
+                      </p>
+                    </div>
+                  );
+                })}
+
+                {overviewData.source && (
+                  <div className="pt-2 text-xs text-neutral-500 flex items-center gap-2">
+                    <span className="inline-flex rounded-full border border-neutral-700 px-2 py-0.5">
+                      {overviewData.source === "ai" && "Powered by AI"}
+                      {overviewData.source === "fallback" && "Based on web results only"}
+                      {overviewData.source === "static" && "Basic overview"}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -266,7 +335,7 @@ export default function PathDetailPage({
                       href={story.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-sm text-black hover:underline"
+                      className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 transition-colors border-b border-transparent hover:border-secondary"
                     >
                       <span
                         style={{ fontFamily: "var(--font-mono)" }}

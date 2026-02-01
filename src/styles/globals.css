@@ -1,30 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  /* Colors - Monochrome palette */
+  /* Base Colors */
   --background: #FFFFFF;
-  --foreground: #000000;
+  --page-bg: #FFF7EC;
+  --foreground: #0A0A0A;
   --card: #FFFFFF;
-  --card-foreground: #000000;
-  --primary: #000000;
+  --card-subtle: #F9FAFB;
+  --card-foreground: #0A0A0A;
+  --muted-text: #6B7280;
+  --border-subtle: #E5E7EB;
+  
+  /* Primary (Hopeful Green) */
+  --primary: #16A34A;
+  --primary-dark: #15803D;
+  --primary-soft: #ECFDF3;
+  --primary-border: #BBF7D0;
   --primary-foreground: #FFFFFF;
-  --secondary: #9A9A9A;
-  --secondary-foreground: #000000;
+  
+  /* Secondary (Warm Energy Yellow) */
+  --secondary: #FACC15;
+  --secondary-dark: #EAB308;
+  --secondary-soft: #FEFCE8;
+  --secondary-border: #FDE68A;
+  --secondary-foreground: #0A0A0A;
+  
+  /* Legacy/Compatibility */
   --muted: #F5F5F5;
-  --muted-foreground: #9A9A9A;
-  --border: #E5E5E5;
-  --input: #E5E5E5;
-  --ring: #000000;
+  --muted-foreground: #6B7280;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #16A34A;
   --radius: 0.5rem;
 }
 
 @theme {
   --font-sans: var(--font-body);
+  
+  /* Base Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-subtle: var(--card-subtle);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-text: var(--muted-text);
+  --color-border-subtle: var(--border-subtle);
+  
+  /* Primary (Green) */
   --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-border: var(--primary-border);
   --color-primary-foreground: var(--primary-foreground);
+  
+  /* Secondary (Yellow) */
   --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-border: var(--secondary-border);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  /* Legacy/Compatibility */
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
@@ -39,7 +75,7 @@
   }
 
   body {
-    background-color: var(--background);
+    background-color: var(--page-bg);
     color: var(--foreground);
   }
 }

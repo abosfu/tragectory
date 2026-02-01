@@ -74,7 +74,7 @@ export default function ResultsPage({
             </p>
             <Link
               href="/"
-              className="inline-flex items-center justify-center bg-black text-white hover:bg-neutral-800 h-10 px-6 text-sm font-medium rounded-lg transition-colors"
+              className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
             >
               ← Start over
             </Link>
@@ -105,7 +105,7 @@ export default function ResultsPage({
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center bg-black text-white hover:bg-neutral-800 h-10 px-6 text-sm font-medium rounded-lg transition-colors"
+                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
               >
                 ← Try again
               </Link>
@@ -127,7 +127,7 @@ export default function ResultsPage({
           <div className="mb-10">
             <Link
               href="/"
-              className="inline-flex items-center text-sm text-neutral-500 hover:text-black mb-6 transition-colors group"
+              className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 mb-6 transition-colors border-b border-transparent hover:border-secondary group"
             >
               <svg
                 className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"
@@ -194,7 +194,13 @@ export default function ResultsPage({
                   <div className="flex items-start gap-4">
                     {/* Rank badge */}
                     <div
-                      className="flex-shrink-0 w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-sm font-medium text-black"
+                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        index === 0
+                          ? "bg-primary-soft text-primary border border-primary-border"
+                          : index === 1
+                          ? "bg-secondary-soft text-secondary-dark border border-secondary-border"
+                          : "bg-neutral-100 text-neutral-700"
+                      }`}
                       style={{ fontFamily: "var(--font-mono)" }}
                     >
                       {index + 1}
@@ -215,12 +221,12 @@ export default function ResultsPage({
                           style={{ fontFamily: "var(--font-mono)" }}
                         >
                           {path.targetRole && (
-                            <span className="bg-neutral-100 px-2 py-1 rounded">
+                            <span className="bg-primary-soft text-primary px-2 py-1 rounded border border-primary-border">
                               {path.targetRole}
                             </span>
                           )}
                           {path.targetIndustry && (
-                            <span className="bg-neutral-100 px-2 py-1 rounded">
+                            <span className="bg-secondary-soft text-secondary-dark px-2 py-1 rounded border border-secondary-border">
                               {path.targetIndustry}
                             </span>
                           )}
@@ -233,7 +239,7 @@ export default function ResultsPage({
 
                       <Link
                         href={`/results/${profileId}/paths/${path.rank}`}
-                        className="inline-flex items-center text-sm text-neutral-600 hover:text-black transition-colors mt-2"
+                        className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 transition-colors border-b border-transparent hover:border-secondary mt-2"
                       >
                         <span
                           style={{ fontFamily: "var(--font-mono)" }}
