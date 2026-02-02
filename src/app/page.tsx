@@ -86,9 +86,9 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--page-bg)] flex flex-col">
+    <div className="min-h-screen bg-[#FFFDF7] flex flex-col">
       {/* Header */}
-      <header className="border-b border-neutral-200/60">
+      <header className="border-b border-[#F3EBDD]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <a
@@ -127,14 +127,14 @@ export default function HomePage() {
           <div className="mx-auto max-w-4xl px-6 py-24 md:py-32">
             <div className="text-center">
               <h1
-                className={`text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-black ${poppins.className}`}
+                className={`text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#111827] ${poppins.className}`}
               >
                 Design the next chapter of your career.
               </h1>
-              <p className="mt-4 max-w-2xl text-base sm:text-lg text-neutral-600 mx-auto">
+              <p className="mt-4 max-w-2xl text-base sm:text-lg text-[#6B7280] mx-auto">
                 See three tailored paths based on where you are right now, with real examples instead of generic advice.
               </p>
-              <p className="mt-6 max-w-2xl text-base sm:text-lg text-neutral-600 mx-auto leading-relaxed">
+              <p className="mt-6 max-w-2xl text-base sm:text-lg text-[#6B7280] mx-auto leading-relaxed">
                 Trajectory helps you stop guessing about your next move. Answer a few questions and compare three paths — a conventional route, a project-heavy route, and an unconventional route — so you leave with real clarity, not more confusion.
               </p>
               <p className="mt-6 text-xs uppercase tracking-[0.2em] text-neutral-400">
@@ -146,14 +146,14 @@ export default function HomePage() {
 
         {/* Section 2: Form + Features */}
         <section className="w-full py-16">
-          <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 md:flex-row md:items-start">
+          <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 md:flex-row md:items-start lg:gap-12">
             {/* Left Column: Form */}
             <div className="w-full max-w-xl">
-              <div className="rounded-2xl px-6 py-8 sm:px-8 sm:py-9">
+              <div className="rounded-2xl bg-[#FFFFFF] border border-[#F3EBDD] shadow-[0_12px_40px_rgba(15,23,42,0.05)] px-6 py-8 sm:px-8 sm:py-9">
                 <div className="mb-6 text-center">
-                  <h2 className="text-lg font-medium text-black">Get started</h2>
-                  <p className="mt-1 text-xs text-neutral-400 text-center">
-                    A few quick questions. Then we'll show you 3 paths that fit.
+                  <h2 className="text-lg font-medium text-[#111827]">Get started</h2>
+                  <p className="mt-1 text-xs text-[#6B7280] text-center">
+                    A few quick questions, then we'll show you 3 paths that fit.
                   </p>
                 </div>
 
@@ -215,7 +215,7 @@ export default function HomePage() {
                         })
                       }
                       disabled={isLoading}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                      className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4DED2] rounded-lg focus:border-[#0F9F6A] focus:outline-none focus:ring-2 focus:ring-[#0F9F6A]/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                         backgroundPosition: "right 0.75rem center",
@@ -245,7 +245,7 @@ export default function HomePage() {
                         setFormData({ ...formData, roles: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full min-h-[80px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full min-h-[80px] px-4 py-3 bg-[#FFFFFF] border border-[#E4DED2] rounded-lg focus:border-[#0F9F6A] focus:outline-none focus:ring-2 focus:ring-[#0F9F6A]/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., product, SWE, sales"
                     />
                   </div>
@@ -265,12 +265,9 @@ export default function HomePage() {
                         setFormData({ ...formData, timeline: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4DED2] rounded-lg focus:border-[#0F9F6A] focus:outline-none focus:ring-2 focus:ring-[#0F9F6A]/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., next 6–12 months"
                     />
-                    <p className="text-xs text-neutral-400 mt-1">
-                      When do you want to make a move?
-                    </p>
                   </div>
 
                   <div className="space-y-1.5">
@@ -307,7 +304,7 @@ export default function HomePage() {
                         setFormData({ ...formData, extraInfo: e.target.value })
                       }
                       disabled={isLoading}
-                      className="w-full min-h-[70px] px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full min-h-[70px] px-4 py-3 bg-[#FFFFFF] border border-[#E4DED2] rounded-lg focus:border-[#0F9F6A] focus:outline-none focus:ring-2 focus:ring-[#0F9F6A]/20 transition-colors resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="e.g., visa, family, GPA, money"
                     />
                   </div>
@@ -319,7 +316,7 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-4 py-3 text-sm font-medium text-white hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-[#0F9F6A] px-4 py-3 text-sm font-medium text-white hover:bg-[#0B7E54] transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? "Creating your paths..." : "Show me my paths →"}
                   </button>
@@ -332,8 +329,8 @@ export default function HomePage() {
 
               {/* Right Column: Features */}
               <div className="w-full md:flex-1 space-y-4">
-                <div className="flex flex-col gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-4">
-                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
+                <div className="rounded-2xl bg-[#FFFFFF] border border-[#F3EBDD] shadow-[0_12px_40px_rgba(15,23,42,0.05)] flex flex-col gap-2 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#E6F6ED] text-[#0F9F6A]">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -348,15 +345,15 @@ export default function HomePage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-sm font-medium text-neutral-900">
+                  <h3 className="text-sm font-medium text-[#111827]">
                     Compare 3 paths side-by-side
                   </h3>
-                  <p className="text-sm text-neutral-500">
+                  <p className="text-sm text-[#6B7280]">
                     See how each path changes your skills, timeline, and options.
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 rounded-xl px-4 py-3 sm:px-5 sm:py-4">
-                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                <div className="rounded-2xl bg-[#FFFFFF] border border-[#F3EBDD] shadow-[0_12px_40px_rgba(15,23,42,0.05)] flex flex-col gap-2 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#FEF6D8] text-[#E0A400]">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -371,10 +368,10 @@ export default function HomePage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-sm font-medium text-neutral-900">
+                  <h3 className="text-sm font-medium text-[#111827]">
                     Real examples, not generic advice
                   </h3>
-                  <p className="text-sm text-neutral-500">
+                  <p className="text-sm text-[#6B7280]">
                     Pulled from real case studies, job posts, and people like you.
                   </p>
                 </div>
@@ -384,7 +381,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-200/60">
+      <footer className="border-t border-[#F3EBDD]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div
