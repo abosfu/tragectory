@@ -2,8 +2,15 @@
 
 import Link from "next/link";
 import { use } from "react";
+import { Poppins } from "next/font/google";
 import { api } from "~/trpc/react";
 import type { StoryForProfile } from "~/server/api/routers/stories";
+
+const poppins = Poppins({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 // Helper function to render nice labels for stage
 function formatStageLabel(stage: string): string {
@@ -78,13 +85,13 @@ export default function PathDetailPage({
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-pulse">
-              <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-neutral-500">Loading path...</p>
+              <div className="w-8 h-8 border-2 border-[#2F8F5B] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-[rgba(11,11,12,0.65)]">Loading path...</p>
             </div>
           </div>
         </main>
@@ -96,22 +103,21 @@ export default function PathDetailPage({
   // Error / Not found state
   if (hasError || !profile || !selectedPath) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md px-6">
             <h2
-              className="text-2xl font-medium text-black mb-4"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className={`text-2xl font-medium text-[#0B0B0C] mb-4 ${poppins.className}`}
             >
               Path not found
             </h2>
-            <p className="text-neutral-500 mb-6">
+            <p className="text-[rgba(11,11,12,0.65)] mb-6">
               This path doesn't exist or may have been removed.
             </p>
             <Link
               href={`/results/${profileId}`}
-              className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center justify-center bg-[#2F8F5B] text-white hover:bg-[#0B7E54] h-10 px-6 text-sm font-medium rounded-lg transition-colors duration-200"
             >
               ← Back to your paths
             </Link>
@@ -124,17 +130,17 @@ export default function PathDetailPage({
 
   // Success state
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
       <Header />
       <main className="flex-1">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
           {/* Back Link */}
           <Link
             href={`/results/${profileId}`}
-              className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 mb-6 transition-colors border-b border-transparent hover:border-secondary group"
+            className="inline-flex items-center text-xs text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] mb-6 transition-colors duration-200 border-b border-transparent hover:border-[#2F8F5B] group"
           >
             <svg
-              className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"
+              className="w-3 h-3 mr-1.5 group-hover:-translate-x-0.5 transition-transform duration-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -148,28 +154,23 @@ export default function PathDetailPage({
             </svg>
             <span
               style={{ fontFamily: "var(--font-mono)" }}
-              className="tracking-wide"
+              className="text-[10px] tracking-wide"
             >
               Back to your paths
             </span>
           </Link>
 
           {/* Page Header */}
-          <div className="mb-10">
-            <div
-              className="inline-block text-xs tracking-[0.2em] uppercase text-neutral-500 px-3 py-1.5 bg-neutral-100 rounded-full mb-4"
-              style={{ fontFamily: "var(--font-mono)" }}
-            >
-              Path Detail
-            </div>
+          <div className="mb-12">
             <h1
-              className="text-3xl lg:text-4xl text-black font-medium leading-tight mb-4"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className={`text-3xl lg:text-4xl text-[#0B0B0C] font-semibold leading-tight mb-3 ${poppins.className}`}
             >
-              Your path: {selectedPath.aiLabel}
+              Real stories for this path
             </h1>
-            <p className="text-neutral-500 text-base leading-relaxed max-w-2xl">
-              Real stories from people who've navigated similar career transitions.
+            <p className="text-sm text-[rgba(11,11,12,0.65)] leading-relaxed max-w-2xl">
+              {stories && stories.some((s) => s.id.startsWith("placeholder-"))
+                ? "Examples will appear here once we can fetch and process real stories that match your profile."
+                : "These are live examples pulled from around the web based on your profile and this path."}
             </p>
           </div>
 
@@ -177,24 +178,17 @@ export default function PathDetailPage({
           <ProfileSummary profile={profile} />
 
           {/* Path Overview Card */}
-          <div className="mt-10 bg-white border border-neutral-200 rounded-xl p-6">
-            <div className="flex items-start gap-4 mb-4">
+          <div className="mt-10 bg-[rgba(255,255,255,0.72)] border border-[rgba(0,0,0,0.08)] rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+            <div className="flex items-start gap-4">
               <div
-                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  rankNumber === 1
-                    ? "bg-primary-soft text-primary border border-primary-border"
-                    : rankNumber === 2
-                    ? "bg-secondary-soft text-secondary-dark border border-secondary-border"
-                    : "bg-neutral-100 text-neutral-700"
-                }`}
+                className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium bg-[rgba(47,143,91,0.12)] text-[#2F8F5B]"
                 style={{ fontFamily: "var(--font-mono)" }}
               >
                 {rankNumber}
               </div>
               <div className="flex-1">
                 <h2
-                  className="text-xl font-medium text-black mb-2"
-                  style={{ fontFamily: "var(--font-heading)" }}
+                  className={`text-xl font-medium text-[#0B0B0C] mb-2 ${poppins.className}`}
                 >
                   {selectedPath.aiLabel}
                 </h2>
@@ -202,23 +196,23 @@ export default function PathDetailPage({
                 {/* Target role/industry tags */}
                 {(selectedPath.targetRole || selectedPath.targetIndustry) && (
                   <div
-                    className="flex flex-wrap gap-2 text-xs text-neutral-500 mb-4"
+                    className="flex flex-wrap gap-2 text-xs mb-4"
                     style={{ fontFamily: "var(--font-mono)" }}
                   >
                     {selectedPath.targetRole && (
-                    <span className="bg-primary-soft text-primary px-2 py-1 rounded border border-primary-border">
-                      {selectedPath.targetRole}
-                    </span>
-                  )}
-                  {selectedPath.targetIndustry && (
-                    <span className="bg-secondary-soft text-secondary-dark px-2 py-1 rounded border border-secondary-border">
-                      {selectedPath.targetIndustry}
-                    </span>
+                      <span className="bg-[rgba(47,143,91,0.12)] text-[#2F8F5B] px-2.5 py-1 rounded-full">
+                        {selectedPath.targetRole}
+                      </span>
+                    )}
+                    {selectedPath.targetIndustry && (
+                      <span className="bg-[rgba(215,178,74,0.14)] text-[#D7B24A] px-2.5 py-1 rounded-full">
+                        {selectedPath.targetIndustry}
+                      </span>
                     )}
                   </div>
                 )}
 
-                <p className="text-sm text-neutral-600 leading-relaxed">
+                <p className="text-sm text-[rgba(11,11,12,0.65)] leading-relaxed">
                   {selectedPath.aiExplanation}
                 </p>
               </div>
@@ -227,34 +221,35 @@ export default function PathDetailPage({
 
           {/* Real Stories Section */}
           <div className="mt-12">
-            <div className="mb-6">
-              <h2
-                className="text-xl font-medium text-black mb-2"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Real stories for this path
-              </h2>
-              <p className="text-sm text-neutral-500">
-                {stories && stories.some((s) => s.id.startsWith("placeholder-"))
-                  ? "Examples will appear here once we can fetch and process real stories that match your profile."
-                  : "These are live examples pulled from around the web based on your profile and this path."}
-              </p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2
+                  className={`text-xl font-medium text-[#0B0B0C] mb-2 ${poppins.className}`}
+                >
+                  Real stories for this path
+                </h2>
+                {overviewData?.source && overviewData.source === "fallback" && (
+                  <span className="inline-flex text-[10px] text-[rgba(11,11,12,0.5)] px-2 py-0.5 rounded-full border border-[rgba(0,0,0,0.10)] bg-transparent">
+                    Based on web results only
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Stories loading state */}
             {storiesLoading && (
-              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-8 text-center">
+              <div className="bg-[rgba(255,255,255,0.72)] rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-8 text-center">
                 <div className="animate-pulse">
-                  <div className="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                  <p className="text-sm text-neutral-500">Finding relevant stories...</p>
+                  <div className="w-6 h-6 border-2 border-[#2F8F5B] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-sm text-[rgba(11,11,12,0.65)]">Finding relevant stories...</p>
                 </div>
               </div>
             )}
 
             {/* Stories error state */}
             {storiesError && (
-              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-6 text-center">
-                <p className="text-sm text-neutral-500">
+              <div className="bg-[rgba(255,255,255,0.72)] rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-6 text-center">
+                <p className="text-sm text-[rgba(11,11,12,0.65)]">
                   We couldn't load stories right now. Try again later.
                 </p>
               </div>
@@ -262,46 +257,41 @@ export default function PathDetailPage({
 
             {/* AI Overview (Gemini) */}
             {overviewLoading && (
-              <div className="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-                <p className="text-sm text-neutral-400">Loading overview...</p>
+              <div className="mb-6 rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[rgba(255,255,255,0.72)] p-4">
+                <p className="text-sm text-[rgba(11,11,12,0.5)]">Loading overview...</p>
               </div>
             )}
 
             {overviewData?.overview && (
-              <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-4 text-sm leading-relaxed shadow-sm space-y-2">
+              <div className="mb-8 space-y-4">
                 {overviewData.overview.split("\n\n").map((block, i) => {
                   const trimmed = block.trim();
                   const isSummary = trimmed.startsWith("Summary:");
                   const isNextMoves = trimmed.startsWith("Next moves:");
 
                   if (!isSummary && !isNextMoves) {
-                    return <p key={i} className="text-neutral-700">{trimmed}</p>;
+                    return <p key={i} className="text-sm text-[rgba(11,11,12,0.65)] leading-relaxed">{trimmed}</p>;
                   }
 
                   const [label, ...rest] = trimmed.split(":");
                   const restText = rest.join(":").trim();
 
                   return (
-                    <div key={i} className={`rounded-lg p-3 ${isSummary ? 'bg-primary-soft border-l-2 border-primary' : 'bg-secondary-soft border-l-2 border-secondary'}`}>
-                      <p>
-                        <span className={`font-semibold ${isSummary ? 'text-primary' : 'text-secondary-dark'}`}>
+                    <div
+                      key={i}
+                      className={`rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-4 ${
+                        isSummary ? "bg-[rgba(47,143,91,0.10)]" : "bg-[rgba(215,178,74,0.12)]"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">
+                        <span className={`font-semibold ${isSummary ? 'text-[#2F8F5B]' : 'text-[#D7B24A]'} ${poppins.className}`}>
                           {label}:
                         </span>{" "}
-                        <span className="text-neutral-700">{restText}</span>
+                        <span className="text-[rgba(11,11,12,0.65)]">{restText}</span>
                       </p>
                     </div>
                   );
                 })}
-
-                {overviewData.source && (
-                  <div className="pt-2 text-xs text-neutral-500 flex items-center gap-2">
-                    <span className="inline-flex rounded-full border border-neutral-700 px-2 py-0.5">
-                      {overviewData.source === "ai" && "Powered by AI"}
-                      {overviewData.source === "fallback" && "Based on web results only"}
-                      {overviewData.source === "static" && "Basic overview"}
-                    </span>
-                  </div>
-                )}
               </div>
             )}
 
@@ -311,31 +301,35 @@ export default function PathDetailPage({
                 {stories.map((story) => (
                   <div
                     key={story.id}
-                    className="bg-white border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors"
+                    className="bg-[rgba(255,255,255,0.72)] border border-[rgba(0,0,0,0.08)] rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.08)] transition-all duration-200 ease-out hover:-translate-y-0.5"
                   >
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <h3
-                        className="text-lg font-medium text-black"
-                        style={{ fontFamily: "var(--font-heading)" }}
+                        className={`text-lg font-semibold text-[#0B0B0C] flex-1 ${poppins.className}`}
                       >
                         {story.title}
                       </h3>
                       <SourceTypeBadge type={story.sourceType} />
                     </div>
 
-                    <p className="text-sm text-neutral-600 leading-relaxed mb-3">
+                    <p className="text-sm text-[rgba(11,11,12,0.65)] leading-relaxed mb-4">
                       {story.shortSummary}
                     </p>
 
-                    <p className="text-xs text-neutral-400 italic mb-4">
-                      {story.whyItMatches}
-                    </p>
+                    <div className="mb-4 pt-4 border-t border-[rgba(0,0,0,0.08)]">
+                      <p className="text-xs font-medium text-[rgba(11,11,12,0.5)] mb-1.5 uppercase tracking-wide">
+                        Why this matters
+                      </p>
+                      <p className="text-xs text-[rgba(11,11,12,0.65)] leading-relaxed">
+                        {story.whyItMatches}
+                      </p>
+                    </div>
 
                     <a
                       href={story.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 transition-colors border-b border-transparent hover:border-secondary"
+                      className="inline-flex items-center text-sm text-[#2F8F5B] hover:text-[#0B7E54] transition-all duration-200 border-b border-transparent hover:border-[#2F8F5B] group"
                     >
                       <span
                         style={{ fontFamily: "var(--font-mono)" }}
@@ -344,7 +338,7 @@ export default function PathDetailPage({
                         Open source
                       </span>
                       <svg
-                        className="ml-2 w-4 h-4"
+                        className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -364,8 +358,8 @@ export default function PathDetailPage({
 
             {/* No stories state (empty array from API when keys present but pipeline fails) */}
             {stories && stories.length === 0 && !storiesLoading && (
-              <div className="bg-neutral-50 rounded-xl border border-neutral-200 p-6 text-center">
-                <p className="text-sm text-neutral-500">
+              <div className="bg-[rgba(255,255,255,0.72)] rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-6 text-center">
+                <p className="text-sm text-[rgba(11,11,12,0.65)]">
                   We couldn't find real stories for this path right now. Try adjusting your
                   inputs or checking back later.
                 </p>
@@ -390,7 +384,7 @@ function SourceTypeBadge({ type }: { type: string }) {
 
   return (
     <span
-      className="flex-shrink-0 text-xs px-2 py-1 bg-neutral-100 text-neutral-500 rounded"
+      className="flex-shrink-0 text-[10px] px-2 py-1 text-[rgba(11,11,12,0.5)] rounded-full border border-[rgba(0,0,0,0.10)] bg-transparent"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {labels[type] ?? "Other"}
@@ -413,37 +407,37 @@ function ProfileSummary({
   };
 }) {
   return (
-    <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
+    <div className="bg-[rgba(255,255,255,0.72)] rounded-2xl p-6 border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
       <h3
-        className="text-sm font-medium text-neutral-500 mb-4 uppercase tracking-wide"
+        className="text-xs font-medium text-[rgba(11,11,12,0.5)] mb-5 uppercase tracking-[0.1em]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
         Your Profile
       </h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Current Status</p>
-          <p className="text-sm text-black font-medium">{profile.currentStatus}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Current Status</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{profile.currentStatus}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Timeline</p>
-          <p className="text-sm text-black font-medium">{profile.timeline}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Timeline</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{profile.timeline}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Stage</p>
-          <p className="text-sm text-black font-medium">{formatStageLabel(profile.stage)}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Stage</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{formatStageLabel(profile.stage)}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Interests</p>
-          <p className="text-sm text-black font-medium line-clamp-2">
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Interests</p>
+          <p className="text-sm text-[#0B0B0C] font-medium line-clamp-2">
             {profile.interests}
           </p>
         </div>
       </div>
       {profile.extraInfo && profile.extraInfo.trim() && (
-        <div className="mt-4 pt-4 border-t border-neutral-200">
-          <p className="text-xs text-neutral-400 mb-1">Extra Context</p>
-          <p className="text-sm text-black">{profile.extraInfo}</p>
+        <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.08)]">
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Extra Context</p>
+          <p className="text-xs text-[rgba(11,11,12,0.65)] leading-relaxed">{profile.extraInfo}</p>
         </div>
       )}
     </div>
@@ -453,12 +447,12 @@ function ProfileSummary({
 // Header Component
 function Header() {
   return (
-    <header className="border-b border-neutral-200">
+    <header className="border-b border-[rgba(0,0,0,0.08)]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="text-sm tracking-[0.25em] uppercase text-black font-medium hover:opacity-70 transition-opacity"
+            className="text-sm tracking-[0.25em] uppercase text-[#0B0B0C] font-medium hover:opacity-70 transition-opacity duration-200"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             TRAJECTORY
@@ -466,15 +460,15 @@ function Header() {
           <nav className="hidden md:flex items-center gap-8">
             <Link
               href="/"
-              className="text-sm text-neutral-500 hover:text-black transition-colors"
+              className="text-sm text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] transition-colors duration-200"
             >
               Home
             </Link>
             <Link
-              href="/paths"
-              className="text-sm text-neutral-500 hover:text-black transition-colors"
+              href="/about"
+              className="text-sm text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] transition-colors duration-200 border-b border-transparent hover:border-[#D7B24A]"
             >
-              Paths
+              About
             </Link>
           </nav>
         </div>
@@ -486,18 +480,15 @@ function Header() {
 // Footer Component
 function Footer() {
   return (
-    <footer className="border-t border-neutral-200 mt-auto">
+    <footer className="border-t border-[rgba(0,0,0,0.08)] mt-auto">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div
-            className="text-xs tracking-[0.2em] uppercase text-neutral-400"
+            className="text-xs tracking-[0.2em] uppercase text-[rgba(11,11,12,0.5)]"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             TRAJECTORY
           </div>
-          <p className="text-sm text-neutral-400">
-            Explore your career possibilities.
-          </p>
         </div>
       </div>
     </footer>

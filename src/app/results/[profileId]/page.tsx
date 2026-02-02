@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { use } from "react";
+import { Poppins } from "next/font/google";
 import { api } from "~/trpc/react";
+
+const poppins = Poppins({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 // Helper function to render nice labels for stage
 function formatStageLabel(stage: string): string {
@@ -41,13 +48,13 @@ export default function ResultsPage({
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-pulse">
-              <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-neutral-500">Loading your paths...</p>
+              <div className="w-8 h-8 border-2 border-[#2F8F5B] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-[rgba(11,11,12,0.65)]">Loading your paths...</p>
             </div>
           </div>
         </main>
@@ -59,22 +66,21 @@ export default function ResultsPage({
   // Error state
   if (hasError || !profile) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md px-6">
             <h2
-              className="text-2xl font-medium text-black mb-4"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className={`text-2xl font-medium text-[#0B0B0C] mb-4 ${poppins.className}`}
             >
               Profile not found
             </h2>
-            <p className="text-neutral-500 mb-6">
+            <p className="text-[rgba(11,11,12,0.65)] mb-6">
               We couldn't find this profile. It may have been deleted or the link is incorrect.
             </p>
             <Link
               href="/"
-              className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center justify-center bg-[#2F8F5B] text-white hover:bg-[#0B7E54] h-10 px-6 text-sm font-medium rounded-lg transition-colors duration-200"
             >
               ← Start over
             </Link>
@@ -88,24 +94,23 @@ export default function ResultsPage({
   // Empty paths state
   if (!paths || paths.length === 0) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
         <Header />
         <main className="flex-1">
-          <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+          <div className="max-w-5xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
             <ProfileSummary profile={profile} />
-            <div className="text-center py-16 bg-neutral-50 rounded-xl border border-neutral-200">
+            <div className="text-center py-16 rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[rgba(255,255,255,0.72)] shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
               <h3
-                className="text-xl font-medium text-black mb-2"
-                style={{ fontFamily: "var(--font-heading)" }}
+                className={`text-xl font-medium text-[#0B0B0C] mb-2 ${poppins.className}`}
               >
                 No paths generated yet
               </h3>
-              <p className="text-neutral-500 mb-6">
+              <p className="text-[rgba(11,11,12,0.65)] mb-6">
                 Something went wrong generating your paths. Please try again.
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary-dark h-10 px-6 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+                className="inline-flex items-center justify-center bg-[#2F8F5B] text-white hover:bg-[#0B7E54] h-10 px-6 text-sm font-medium rounded-lg transition-colors duration-200"
               >
                 ← Try again
               </Link>
@@ -119,50 +124,50 @@ export default function ResultsPage({
 
   // Success state with paths
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#FBF7EF] flex flex-col">
       <Header />
       <main className="flex-1">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
           {/* Page Header */}
-          <div className="mb-10">
-            <Link
-              href="/"
-              className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 mb-6 transition-colors border-b border-transparent hover:border-secondary group"
-            >
-              <svg
-                className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div className="mb-12">
+            <div className="flex items-center gap-4 mb-6">
+              <Link
+                href="/"
+                className="inline-flex items-center text-xs text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] transition-colors duration-200 border-b border-transparent hover:border-[#2F8F5B] group"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                />
-              </svg>
-              <span
+                <svg
+                  className="w-3 h-3 mr-1.5 group-hover:-translate-x-0.5 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                  />
+                </svg>
+                <span
+                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[10px] tracking-wide"
+                >
+                  Start new exploration
+                </span>
+              </Link>
+              <div
+                className="inline-block text-[10px] tracking-[0.15em] uppercase text-[rgba(11,11,12,0.5)] px-2.5 py-1 rounded-full"
                 style={{ fontFamily: "var(--font-mono)" }}
-                className="tracking-wide"
               >
-                Start new exploration
-              </span>
-            </Link>
-
-            <div
-              className="inline-block text-xs tracking-[0.2em] uppercase text-neutral-500 px-3 py-1.5 bg-neutral-100 rounded-full mb-4"
-              style={{ fontFamily: "var(--font-mono)" }}
-            >
-              Your Results
+                Your Results
+              </div>
             </div>
             <h1
-              className="text-3xl lg:text-4xl text-black font-medium leading-tight mb-4"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className={`text-3xl lg:text-4xl text-[#0B0B0C] font-semibold leading-tight mb-3 ${poppins.className}`}
             >
               Your possible trajectories
             </h1>
-            <p className="text-neutral-500 text-base leading-relaxed max-w-2xl">
+            <p className="text-[rgba(11,11,12,0.65)] text-base leading-relaxed max-w-2xl">
               Based on your background and interests, here are three possible
               career directions you could explore.
             </p>
@@ -172,15 +177,14 @@ export default function ResultsPage({
           <ProfileSummary profile={profile} />
 
           {/* Paths List */}
-          <div className="mt-10">
+          <div className="mt-12">
             <div className="flex items-center justify-between mb-6">
               <h2
-                className="text-xl font-medium text-black"
-                style={{ fontFamily: "var(--font-heading)" }}
+                className={`text-xl font-medium text-[#0B0B0C] ${poppins.className}`}
               >
                 Recommended Paths
               </h2>
-              <span className="text-sm text-neutral-400">
+              <span className="text-xs text-[rgba(11,11,12,0.5)]">
                 {paths.length} {paths.length === 1 ? "path" : "paths"}
               </span>
             </div>
@@ -189,18 +193,12 @@ export default function ResultsPage({
               {paths.map((path, index) => (
                 <div
                   key={path.id}
-                  className="bg-white border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors"
+                  className="bg-[rgba(255,255,255,0.72)] border border-[rgba(0,0,0,0.08)] rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.08)] transition-all duration-200 ease-out hover:-translate-y-0.5"
                 >
                   <div className="flex items-start gap-4">
                     {/* Rank badge */}
                     <div
-                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        index === 0
-                          ? "bg-primary-soft text-primary border border-primary-border"
-                          : index === 1
-                          ? "bg-secondary-soft text-secondary-dark border border-secondary-border"
-                          : "bg-neutral-100 text-neutral-700"
-                      }`}
+                      className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium bg-[rgba(47,143,91,0.12)] text-[#2F8F5B]"
                       style={{ fontFamily: "var(--font-mono)" }}
                     >
                       {index + 1}
@@ -208,8 +206,7 @@ export default function ResultsPage({
 
                     <div className="flex-1">
                       <h3
-                        className="text-lg font-medium text-black mb-2"
-                        style={{ fontFamily: "var(--font-heading)" }}
+                        className={`text-lg font-medium text-[#0B0B0C] mb-2 ${poppins.className}`}
                       >
                         {path.aiLabel}
                       </h3>
@@ -217,29 +214,29 @@ export default function ResultsPage({
                       {/* Target role/industry tags */}
                       {(path.targetRole || path.targetIndustry) && (
                         <div
-                          className="flex flex-wrap gap-2 text-xs text-neutral-500 mb-3"
+                          className="flex flex-wrap gap-2 text-xs mb-3"
                           style={{ fontFamily: "var(--font-mono)" }}
                         >
                           {path.targetRole && (
-                            <span className="bg-primary-soft text-primary px-2 py-1 rounded border border-primary-border">
+                            <span className="bg-[rgba(47,143,91,0.12)] text-[#2F8F5B] px-2.5 py-1 rounded-full">
                               {path.targetRole}
                             </span>
                           )}
                           {path.targetIndustry && (
-                            <span className="bg-secondary-soft text-secondary-dark px-2 py-1 rounded border border-secondary-border">
+                            <span className="bg-[rgba(215,178,74,0.14)] text-[#D7B24A] px-2.5 py-1 rounded-full">
                               {path.targetIndustry}
                             </span>
                           )}
                         </div>
                       )}
 
-                      <p className="text-sm text-neutral-600 leading-relaxed mb-4">
+                      <p className="text-sm text-[rgba(11,11,12,0.65)] leading-relaxed mb-4">
                         {path.aiExplanation}
                       </p>
 
                       <Link
                         href={`/results/${profileId}/paths/${path.rank}`}
-                        className="inline-flex items-center text-sm text-neutral-700 hover:text-neutral-900 transition-colors border-b border-transparent hover:border-secondary mt-2"
+                        className="inline-flex items-center text-sm text-[#2F8F5B] hover:text-[#0B7E54] transition-all duration-200 border-b border-transparent hover:border-[#2F8F5B] group"
                       >
                         <span
                           style={{ fontFamily: "var(--font-mono)" }}
@@ -248,7 +245,7 @@ export default function ResultsPage({
                           View real stories
                         </span>
                         <svg
-                          className="ml-2 w-4 h-4"
+                          className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -289,37 +286,37 @@ function ProfileSummary({
   };
 }) {
   return (
-    <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
+    <div className="bg-[rgba(255,255,255,0.72)] rounded-2xl p-6 border border-[rgba(0,0,0,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
       <h3
-        className="text-sm font-medium text-neutral-500 mb-4 uppercase tracking-wide"
+        className="text-xs font-medium text-[rgba(11,11,12,0.5)] mb-5 uppercase tracking-[0.1em]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
         Your Profile
       </h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Current Status</p>
-          <p className="text-sm text-black font-medium">{profile.currentStatus}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Current Status</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{profile.currentStatus}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Timeline</p>
-          <p className="text-sm text-black font-medium">{profile.timeline}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Timeline</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{profile.timeline}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Stage</p>
-          <p className="text-sm text-black font-medium">{formatStageLabel(profile.stage)}</p>
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Stage</p>
+          <p className="text-sm text-[#0B0B0C] font-medium">{formatStageLabel(profile.stage)}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400 mb-1">Interests</p>
-          <p className="text-sm text-black font-medium line-clamp-2">
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Interests</p>
+          <p className="text-sm text-[#0B0B0C] font-medium line-clamp-2">
             {profile.interests}
           </p>
         </div>
       </div>
       {profile.extraInfo && profile.extraInfo.trim() && (
-        <div className="mt-4 pt-4 border-t border-neutral-200">
-          <p className="text-xs text-neutral-400 mb-1">Extra Context</p>
-          <p className="text-sm text-black">{profile.extraInfo}</p>
+        <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.08)]">
+          <p className="text-xs text-[rgba(11,11,12,0.5)] mb-1.5">Extra Context</p>
+          <p className="text-xs text-[rgba(11,11,12,0.65)] leading-relaxed">{profile.extraInfo}</p>
         </div>
       )}
     </div>
@@ -329,12 +326,12 @@ function ProfileSummary({
 // Header Component
 function Header() {
   return (
-    <header className="border-b border-neutral-200">
+    <header className="border-b border-[rgba(0,0,0,0.08)]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="text-sm tracking-[0.25em] uppercase text-black font-medium hover:opacity-70 transition-opacity"
+            className="text-sm tracking-[0.25em] uppercase text-[#0B0B0C] font-medium hover:opacity-70 transition-opacity duration-200"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             TRAJECTORY
@@ -342,15 +339,15 @@ function Header() {
           <nav className="hidden md:flex items-center gap-8">
             <Link
               href="/"
-              className="text-sm text-neutral-500 hover:text-black transition-colors"
+              className="text-sm text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] transition-colors duration-200"
             >
               Home
             </Link>
             <Link
-              href="/paths"
-              className="text-sm text-neutral-500 hover:text-black transition-colors"
+              href="/about"
+              className="text-sm text-[rgba(11,11,12,0.65)] hover:text-[#0B0B0C] transition-colors duration-200 border-b border-transparent hover:border-[#D7B24A]"
             >
-              Paths
+              About
             </Link>
           </nav>
         </div>
@@ -362,18 +359,15 @@ function Header() {
 // Footer Component
 function Footer() {
   return (
-    <footer className="border-t border-neutral-200 mt-auto">
+    <footer className="border-t border-[rgba(0,0,0,0.08)] mt-auto">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div
-            className="text-xs tracking-[0.2em] uppercase text-neutral-400"
+            className="text-xs tracking-[0.2em] uppercase text-[rgba(11,11,12,0.5)]"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             TRAJECTORY
           </div>
-          <p className="text-sm text-neutral-400">
-            Explore your career possibilities.
-          </p>
         </div>
       </div>
     </footer>
