@@ -113,37 +113,6 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000)
 
----
-
-## Design
-
-TRAJECTORY uses a monochrome, tech-forward aesthetic:
-
-- **Colors**: White (#FFFFFF), Black (#000000), Grey (#9A9A9A), Borders (#E5E5E5)
-- **Typography**: 
-  - Headings: Space Grotesk (geometric, slightly robotic)
-  - Body: Inter (clean, readable)
-  - Labels/Code: IBM Plex Mono (technical feel)
-- **Style**: No gradients, no bright colors—clean and professional
-
----
-
-## Current Status
-
-| Feature | Status |
-|---------|--------|
-| Landing page UI | ✅ Complete |
-| Paths listing page | ✅ Complete |
-| Path detail page | ✅ Complete |
-| tRPC API setup | ✅ Complete |
-| Mock data | ✅ Complete |
-| Database schema | 🔄 In Progress |
-| User profiles | 📋 Planned |
-| AI recommendations | 📋 Planned |
-| Case study ingestion | 📋 Planned |
-
----
-
 ## Scripts
 
 ```bash
@@ -161,23 +130,7 @@ npx prisma db push   # Push schema changes to database
 npx prisma generate  # Regenerate Prisma client
 ```
 
----
 
-## Contributing
-
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Make your changes
-3. Run linting: `npm run lint`
-4. Commit and push
-5. Open a Pull Request
-
----
-
-## License
-
-MIT
-
----
 
 <p align="center">
   <strong>TRAJECTORY</strong> — See what's possible from where you are now.
