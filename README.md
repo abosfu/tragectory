@@ -16,14 +16,6 @@ The idea is simple: instead of generic career advice, show users **real stories*
 - **Paths Page**: Displays multiple career directions the user could explore (e.g., Software Engineering, Business/Product, Construction-Tech)
 - **Path Detail Page**: Shows curated case studies for each path—real stories of people who made that career transition
 
-### What's Coming
-
-- AI-powered path recommendations based on user profile
-- Automated case study ingestion from YouTube, blogs, LinkedIn
-- Personalized summaries and action items
-- User accounts and saved paths
-
----
 
 ## Tech Stack
 
