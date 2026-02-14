@@ -17,20 +17,6 @@ The idea is simple: instead of generic career advice, show users **real stories*
 - **Path Detail Page**: Shows curated case studies for each path—real stories of people who made that career transition
 
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
-| Language | TypeScript |
-| Styling | [Tailwind CSS](https://tailwindcss.com/) |
-| API | [tRPC](https://trpc.io/) |
-| Database | [Prisma](https://prisma.io/) + PostgreSQL |
-| Fonts | Space Grotesk, Inter, IBM Plex Mono |
-
-Built with the [T3 Stack](https://create.t3.gg/).
-
----
 
 ## Project Structure
 
